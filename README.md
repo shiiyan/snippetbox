@@ -1,6 +1,6 @@
 # Snippetbox
 
-## development with docker
+## how to develop with docker
 
 build and start the container.
 
@@ -12,6 +12,12 @@ starting a shell inside the container.
 
 ```
 docker compose exec -it snippetbox bash
+```
+
+run the server.
+
+```
+make run
 ```
 
 clean up.
