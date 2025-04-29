@@ -9,7 +9,9 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+	}))
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
