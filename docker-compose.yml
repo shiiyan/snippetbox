@@ -1,5 +1,5 @@
 services:
-  snippetbox:
+  app:
     image: golang:latest
     ports:
       - "4000:4000"
@@ -8,3 +8,17 @@ services:
     working_dir: /app
     stdin_open: true
     tty: true
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
