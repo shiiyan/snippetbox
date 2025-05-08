@@ -3,7 +3,7 @@ package main
 import "net/http"
 
 func (app *application) routes() http.Handler {
-	
+
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir(app.config.staticDir))
@@ -14,5 +14,5 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /snippet/create", app.snippetCreate)
 	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
 
-	return commonHeaders(mux)
+	return app.logRequest(commonHeaders(mux))
 }
