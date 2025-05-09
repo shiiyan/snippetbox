@@ -72,9 +72,14 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
-	logger.Info("starting server", slog.String("addr", cfg.addr))
+	srv := &http.Server{
+		Addr: cfg.addr,
+		Handler: app.routes(),
+	}
 
-	err = http.ListenAndServe(cfg.addr, app.routes())
+	logger.Info("starting server", slog.String("addr", srv.Addr))
+
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }
