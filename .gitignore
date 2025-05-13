@@ -1,2 +1,5 @@
 # TLS key and cert (generated)
 tls/*.pem
+
+# binary build
+bin
