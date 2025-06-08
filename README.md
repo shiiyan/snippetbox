@@ -5,19 +5,25 @@
 build and start the container.
 
 ```shell
-docker compose up --build --remove-orphans -d
+docker-compose up --build --remove-orphans -d
+```
+
+update docker images.
+
+```shell
+docker-compose pull
 ```
 
 open a shell inside the web application container.
 
 ```shell
-docker compose exec -it app bash
+docker-compose exec -it app bash
 ```
 
 open a shell inside the mysql container.
 
 ```
-docker compose exec -it mysql bash
+docker-compose exec -it mysql bash
 ```
 
 run the server.
@@ -29,5 +35,5 @@ make run
 clean up.
 
 ```shell
-docker compose down
+docker-compose down
 ```
