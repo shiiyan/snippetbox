@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/justinas/nosurf"
 )
 
@@ -27,13 +28,13 @@ func commonHeaders(next http.Handler) http.Handler {
 func (app *application) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (
-			ip     = r.RemoteAddr
-			proto  = r.Proto
-			method = r.Method
-			uri    = r.URL.RequestURI()
+			ip      = r.RemoteAddr
+			proto   = r.Proto
+			method  = r.Method
+			uri     = r.URL.RequestURI()
 		)
 
-		app.logger.Info("received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
+		app.LogInfo(r, "received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
 
 		next.ServeHTTP(w, r)
 	})
@@ -95,6 +96,15 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			r = r.WithContext(ctx)
 		}
 
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) addTraceID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		traceID := uuid.New().String()
+		ctx := context.WithValue(r.Context(), traceIDContextKey, traceID)
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }

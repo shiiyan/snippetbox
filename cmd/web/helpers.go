@@ -20,7 +20,8 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 		trace  = string(debug.Stack())
 	)
 
-	app.logger.Error(
+	app.LogError(
+		r,
 		err.Error(),
 		slog.String("method", method),
 		slog.String("uri", uri),
@@ -31,6 +32,16 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
+}
+
+func (app *application) LogInfo(r *http.Request, msg string, args ...interface{}) {
+	traceID := app.getTraceID(r)
+	app.logger.Info(msg, append(args, "trace_id", traceID)...)
+}
+
+func (app *application) LogError(r *http.Request, msg string, args ...interface{}) {
+	traceID := app.getTraceID(r)
+	app.logger.Error(msg, append(args, "trace_id", traceID)...)
 }
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
@@ -89,4 +100,12 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	}
 
 	return isAuthenticated
+}
+
+func (app *application) getTraceID(r *http.Request) string {
+	traceID, ok := r.Context().Value(traceIDContextKey).(string)
+	if !ok {
+		return ""
+	}
+	return traceID
 }
