@@ -37,3 +37,9 @@ clean up.
 ```shell
 docker-compose down
 ```
+
+send request to local development server.
+
+```shell
+curl -k -v https://localhost:4000
+```
