@@ -6,10 +6,22 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    stdin_open: true
-    tty: true
+    command: go run ./cmd/web
     depends_on:
       - mysql
+      - loki
+    networks:
+      - app-network
+      - logging
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+        loki-retries: "3"
+        loki-batch-size: "102400"
+        loki-batch-wait: "10s"
+        loki-timeout: "1s"
+
   mysql:
     image: mysql:latest
     restart: unless-stopped
@@ -19,6 +31,42 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki-data:/tmp/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - logging
+    user: "0"
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasource.yaml
+    depends_on:
+      - loki
+    networks:
+      - logging
 
 volumes:
   mysql-data:
+  loki-data:
+  grafana-storage:
+
+networks:
+  app-network:
+    driver: bridge
+  logging:
+    driver: bridge

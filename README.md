@@ -43,3 +43,9 @@ send request to local development server.
 ```shell
 curl -k -v https://localhost:4000
 ```
+
+open Grafana explore
+
+```
+http://localhost:3000/explore
+```
